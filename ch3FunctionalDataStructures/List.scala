@@ -122,10 +122,38 @@ object List { // (4)
     case Cons(_, xs) => Cons(v, xs)
   }
 
+  /*
+  * Exercise 4: Generalize tail to the function drop, which removes the first n elements
+  * from a list. Notice this function takes time proportional only to the number of elements
+  * being dropped - we do not need to make a copy of the entire List.
+  * */
+  def drop[A](l: List[A], n: Int): List[A] = {
+    if (n <= 1) l
+    else l match {
+      case Nil => Nil
+      case Cons(x, xs) => drop(xs, n - 1)
+    }
+  }
+
+  /*
+  * Exercise 5: Implement dropWhile, which removes elements from the List prefix as long
+  * as they match a predicate.
+  * Note the 'if guard' in the 2nd case. This helps with additional checks.
+  * */
+  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+    case _ => l
+    case Cons(x, xs) if f(h) => dropWhile(xs, f)
+  }
+
+
 }
 
 @main
 def mainFunc(): Unit = {
   val a = new Cons[Int](1, Cons(2, Cons(3, Cons(4, Nil))))
+  println(a)
+  println("------------------")
   println(List.setHead(a, 5))
+  println(List.tail(a))
+  println(List.drop(a, 4))
 }
