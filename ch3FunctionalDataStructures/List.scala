@@ -131,7 +131,7 @@ object List { // (4)
     if (n <= 1) l
     else l match {
       case Nil => Nil
-      case Cons(x, xs) => drop(xs, n - 1)
+      case Cons(_, xs) => drop(xs, n - 1)
     }
   }
 
@@ -140,11 +140,12 @@ object List { // (4)
   * as they match a predicate.
   * Note the 'if guard' in the 2nd case. This helps with additional checks.
   * */
-  def dropWhile[A](l: List[A], f: A => Boolean): List[A] = l match {
+  def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
+    // Note currying in line 145
+    case Cons(x, xs) if f(x) => dropWhile(xs)(f)
     case _ => l
-    case Cons(x, xs) if f(h) => dropWhile(xs, f)
   }
-  
+
   /*
   * Append Function
   * */
@@ -163,14 +164,37 @@ object List { // (4)
     case Cons(x, xs) => Cons(x, init(xs))
   }
 
+  /*
+  * It is also possible to abstract away the operators and Nil matches.
+  * Consider the 'sum' and 'product' methods.
+  * They are effectively common except for the + and * operators and
+  * unit values 0 (for sum) and 1.0 (for product). Consider the following approach.
+  * */
+  def foldRight[A,B](l: List[A], z: B)(f: (A,B) => B): B = l match {
+    case Nil => z                                         // 'z' indicates the unit value
+    case Cons(x, xs) => f(x, foldRight(xs, z)(f))         // apply f
+  }
+
+  /*
+  * New implementations of sum and product using foldRight
+  * */
+  def sum2(l: List[Int]): Int = foldRight(l, 0)((x,y) => x + y)
+
+  def product2(l: List[Double]): Double = foldRight(l, 1.0)(_ * _)  // _ * _ is more concise notion for
+                                                                    // (x,y) => x * y
 }
 
 @main
 def mainFunc(): Unit = {
   val a = new Cons[Int](1, Cons(2, Cons(3, Cons(4, Nil))))
+  val b = new Cons[Double](1.0, Cons(2.0, Cons(3.0, Cons(4.0, Nil))))
   println(a)
-  println("------------------")
+  println("-------------------------------")
+  println(List.sum(a))
+  println(List.product(b))
   println(List.setHead(a, 5))
   println(List.tail(a))
   println(List.drop(a, 4))
+  println(List.dropWhile(a)(b => b % 2 == 0))
+  println(List.init(a))
 }
