@@ -144,7 +144,24 @@ object List { // (4)
     case _ => l
     case Cons(x, xs) if f(h) => dropWhile(xs, f)
   }
+  
+  /*
+  * Append Function
+  * */
+  def append[A](a1: List[A], a2: List[A]): List[A] = a1 match {
+    case Nil => a2
+    case Cons(x, xs) => Cons(x, append(xs, a2))
+  }
 
+  /*
+  * Exercise 6: Implement a function init, which returns a List consisting of all
+  * but the last element of a List. E.g given List(1,2,3,4), init will return List(1,2,3).
+  * */
+  def init[A](l: List[A]): List[A] = l match {
+    case Nil => sys.error("init of empty list")
+    case Cons(_, Nil) => Nil
+    case Cons(x, xs) => Cons(x, init(xs))
+  }
 
 }
 
