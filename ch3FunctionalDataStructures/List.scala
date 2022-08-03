@@ -141,7 +141,7 @@ object List { // (4)
   * Note the 'if guard' in the 2nd case. This helps with additional checks.
   * */
   def dropWhile[A](l: List[A])(f: A => Boolean): List[A] = l match {
-    // Note currying in line 145
+    // Note currying in line 145 => dropWhile(xs)(f)
     case Cons(x, xs) if f(x) => dropWhile(xs)(f)
     case _ => l
   }
@@ -182,6 +182,18 @@ object List { // (4)
 
   def product2(l: List[Double]): Double = foldRight(l, 1.0)(_ * _)  // _ * _ is more concise notion for
                                                                     // (x,y) => x * y
+
+  /*
+  * foldRight evaluation trace
+  * foldRight(Cons(1, Cons(2, Cons(3, Nil))), 0)((x, y) => x + y)
+  * 1 + foldRight(Cons(2, Cons(3, Nil)), 0)((x, y) => x + y)
+  * 1 + (2 + foldRight(Cons(3, Nil), 0)((x, y) => x + y))
+  * 1 + (2 + (3 + (foldRight(Nil, 0)((x, y) => x + y))))
+  * 1 + (2 + (3 + (0)))
+  * 6
+  * */
+
+
 }
 
 @main
@@ -189,12 +201,28 @@ def mainFunc(): Unit = {
   val a = new Cons[Int](1, Cons(2, Cons(3, Cons(4, Nil))))
   val b = new Cons[Double](1.0, Cons(2.0, Cons(3.0, Cons(4.0, Nil))))
   println(a)
-  println("-------------------------------")
-  println(List.sum(a))
-  println(List.product(b))
+  println("---------------------------------------------")
+  println("Sum: " + List.sum(a))
+  println("Product" + List.product(b))
   println(List.setHead(a, 5))
   println(List.tail(a))
   println(List.drop(a, 4))
   println(List.dropWhile(a)(b => b % 2 == 0))
   println(List.init(a))
+  /*
+  * Exercise 7: Can 'product' implemented using foldRight immediately halt recursion
+  * and return 0.0 if it encounters a 0.0? Why or why not?
+  * -- 
+  * */
+  val c = new Cons[Double](1.0, Cons(0.0, Cons(3.0, Cons(4.0, Nil))))
+  println("Product2: " + List.product2(c))
+
+  /*
+  * Exercise 8: See what happens when you pass Nil and Cons to foldRight
+  * e.g foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))
+  * What do you think this says about the relationship between foldRight and
+  * the data constructors of List?
+  * */
+  println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))) // Cons(1,Cons(2,Cons(3,Nil)))
+  // This shows that foldRight can be used to construct a singly linked list.
 }
