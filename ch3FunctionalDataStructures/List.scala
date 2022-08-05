@@ -178,9 +178,9 @@ object List { // (4)
   /*
   * New implementations of sum and product using foldRight
   * */
-  def sum2(l: List[Int]): Int = foldRight(l, 0)((x,y) => x + y)
+  def sumRight(l: List[Int]): Int = foldRight(l, 0)((x,y) => x + y)
 
-  def product2(l: List[Double]): Double = foldRight(l, 1.0)(_ * _)  // _ * _ is more concise notion for
+  def productRight(l: List[Double]): Double = foldRight(l, 1.0)(_ * _)  // _ * _ is more concise notion for
                                                                     // (x,y) => x * y
 
   /*
@@ -193,7 +193,28 @@ object List { // (4)
   * 6
   * */
 
+  /*
+  * Exercise 9: Compute the length of a list using foldRight.
+  * */
+  def lengthRight[A](l: List[A]): Int = foldRight(l, 0)((x, xs) => 1 + xs)
 
+  /*
+  * Exercise 10: foldRight is not tail-recursive and will StackOverflow
+  * for large lists. Convince yourself that this is the case, then write
+  * another general list-recursion function, foldLeft that this is
+  * tail-recursive, using the techniques we discussed in the previous chapter
+  * */
+  def foldLeft[A,B](l: List[A], z: B)(f: (B, A) => B): B = l match {
+    case Nil => z
+    case Cons(x, xs) => f(foldLeft(xs, z)(f), x)
+  }
+
+  /*
+  * Exercise 11: Write sum, product, and a function to compute the length of a
+  * list using foldLeft.*/
+  def sumLeft(l: List[Int]): Int = foldLeft(l, 0)((x, y) => x + y)
+  def productLeft(l: List[Double]): Double = foldLeft(l, 1.0)((x, y) => x * y)
+  def lengthLeft[A](l: List[A]): Int = foldLeft(l, 0)((x, xs) => xs + 1)
 }
 
 @main
@@ -202,8 +223,7 @@ def mainFunc(): Unit = {
   val b = new Cons[Double](1.0, Cons(2.0, Cons(3.0, Cons(4.0, Nil))))
   println(a)
   println("---------------------------------------------")
-  println("Sum: " + List.sum(a))
-  println("Product" + List.product(b))
+
   println(List.setHead(a, 5))
   println(List.tail(a))
   println(List.drop(a, 4))
@@ -212,17 +232,27 @@ def mainFunc(): Unit = {
   /*
   * Exercise 7: Can 'product' implemented using foldRight immediately halt recursion
   * and return 0.0 if it encounters a 0.0? Why or why not?
-  * -- 
+  * -- No because no case handles exiting with a 0.0. Therefore it would arrive at 0.0 via
+  *    recursion cycles till it terminates with the exit condition (Nil).
   * */
+  println("Sum Default: " + List.sum(a))
+  println("Product Default: " + List.product(b))
   val c = new Cons[Double](1.0, Cons(0.0, Cons(3.0, Cons(4.0, Nil))))
-  println("Product2: " + List.product2(c))
-
+  println("Sum foldRight: " + List.sumRight(a))
+  println("Product foldRight: " + List.productRight(c))
+  println("Length of 'a' foldRight: " + List.lengthRight(a))
+  println("Sum foldLeft: " + List.sumLeft(a))
+  println("Product foldLeft: " + List.productLeft(c))
+  println("Length of 'a' foldLeft: " + List.lengthLeft(a))
   /*
   * Exercise 8: See what happens when you pass Nil and Cons to foldRight
   * e.g foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))
   * What do you think this says about the relationship between foldRight and
   * the data constructors of List?
+  * -- This shows that foldRight can be used to construct a singly-linked list by giving it
+  *    Nil as the terminating condition and Cons definition for storing each element from List
   * */
   println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))) // Cons(1,Cons(2,Cons(3,Nil)))
   // This shows that foldRight can be used to construct a singly linked list.
+
 }
