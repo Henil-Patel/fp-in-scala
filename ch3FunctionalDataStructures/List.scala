@@ -215,7 +215,17 @@ object List { // (4)
   def sumLeft(l: List[Int]): Int = foldLeft(l, 0)((x, y) => x + y)
   def productLeft(l: List[Double]): Double = foldLeft(l, 1.0)((x, y) => x * y)
   def lengthLeft[A](l: List[A]): Int = foldLeft(l, 0)((x, xs) => xs + 1)
+  
+  /*
+  * Exercise 12: Write a function that returns the reverse of a list (so given
+  * List(1,2,3) it returns List(3,2,1). See if you can write it using a fold.
+  * */
+  def reverse[A](l: List[A]): List[A] = l match {
+    case Cons(x, xs) => append(reverse(xs), List(x))
+    case Nil => Nil
+  }
 }
+
 
 @main
 def mainFunc(): Unit = {
@@ -254,5 +264,5 @@ def mainFunc(): Unit = {
   * */
   println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))) // Cons(1,Cons(2,Cons(3,Nil)))
   // This shows that foldRight can be used to construct a singly linked list.
-
+  println(List.reverse(a))
 }
