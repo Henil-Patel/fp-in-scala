@@ -196,7 +196,7 @@ object List { // (4)
   /*
   * Exercise 9: Compute the length of a list using foldRight.
   * */
-  def lengthRight[A](l: List[A]): Int = foldRight(l, 0)((x, xs) => 1 + xs)
+  def lengthRight[A](l: List[A]): Int = foldRight(l, 0)((_, x) => x + 1)
 
   /*
   * Exercise 10: foldRight is not tail-recursive and will StackOverflow
@@ -214,8 +214,8 @@ object List { // (4)
   * list using foldLeft.*/
   def sumLeft(l: List[Int]): Int = foldLeft(l, 0)((x, y) => x + y)
   def productLeft(l: List[Double]): Double = foldLeft(l, 1.0)((x, y) => x * y)
-  def lengthLeft[A](l: List[A]): Int = foldLeft(l, 0)((x, xs) => xs + 1)
-  
+  def lengthLeft[A](l: List[A]): Int = foldLeft(l, 0)((x, _) => x + 1)
+
   /*
   * Exercise 12: Write a function that returns the reverse of a list (so given
   * List(1,2,3) it returns List(3,2,1). See if you can write it using a fold.
@@ -224,8 +224,16 @@ object List { // (4)
     case Cons(x, xs) => append(reverse(xs), List(x))
     case Nil => Nil
   }
-}
+  // revisit later
+  //def revFold[A](l: List[A]): List[A] = foldLeft(l, List[A]())((x, y) => Cons(y, x))
 
+  /*
+  * Exercise 13 (hard): Can you write foldLeft in terms of foldRight? Vice versa?
+  * */
+
+  def foldLeftViaRight[A, B](l: List[A], z: B)(f: (B, A) => B): B =
+    foldRight(l, (b: B) => b)((a: A, g: B => B) => (b: B) => g(f(b, a)))(z)
+}
 
 @main
 def mainFunc(): Unit = {
@@ -245,6 +253,7 @@ def mainFunc(): Unit = {
   * -- No because no case handles exiting with a 0.0. Therefore it would arrive at 0.0 via
   *    recursion cycles till it terminates with the exit condition (Nil).
   * */
+  println("\n\n")
   println("Sum Default: " + List.sum(a))
   println("Product Default: " + List.product(b))
   val c = new Cons[Double](1.0, Cons(0.0, Cons(3.0, Cons(4.0, Nil))))
@@ -254,6 +263,7 @@ def mainFunc(): Unit = {
   println("Sum foldLeft: " + List.sumLeft(a))
   println("Product foldLeft: " + List.productLeft(c))
   println("Length of 'a' foldLeft: " + List.lengthLeft(a))
+  println("\n\n")
   /*
   * Exercise 8: See what happens when you pass Nil and Cons to foldRight
   * e.g foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))
@@ -264,5 +274,7 @@ def mainFunc(): Unit = {
   * */
   println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))) // Cons(1,Cons(2,Cons(3,Nil)))
   // This shows that foldRight can be used to construct a singly linked list.
-  println(List.reverse(a))
+  println("Reverse without fold:" + List.reverse(a))
+  println("Reverse with left fold: " + List.revFold(a))
+
 }
