@@ -255,6 +255,44 @@ object List { // (4)
     foldRight(ls, Nil: List[A])(append)
   }
 
+  /*
+  * Exercise 16: Write a function that transforms a list of integers by adding 1
+  * to each element. (Reminder: this should be a pure function that returns a new
+  * List!)
+  * */
+  def addOne(ls: List[Int]): List[Int] = ls match {
+    case Nil => Nil
+    case Cons(x, xs) => Cons(x + 1, addOne(xs))
+  }
+
+  // Alternative implementation using fold
+  def incrementEach(ls: List[Int]): List[Int] = {
+    foldRight(ls, Nil: List[Int])((x, xs) => Cons(x + 1, xs))
+  }
+
+  /*
+  * Exercise 17: Write a function that turns each value in a List[Double] into
+  * a String.
+  * */
+  def doubleToString(ls: List[Double]): List[String] = {
+    foldRight(ls, Nil: List[String])((x, xs) => Cons(x.toString, xs))
+  }
+  /*
+  * Exercise 18L Write a function map, that generalizes modifying each element
+  * in a list while maintaining the structure of the list.
+  * */
+  def map[A, B](l: List[A])(f: A => B): List[B] = {
+    l match {
+      case Nil => Nil
+      case Cons(x, xs) => Cons(f(x), map(xs)(f))
+    }
+  }
+
+  // Alternatively using fold
+  def mapFold[A, B](l: List[A])(f: A => B): List[B] = {
+    foldRight(l, Nil: List[A])((x, xs) => Cons(f(x), xs))
+  }
+
 }
 
 @main
@@ -303,4 +341,11 @@ def mainFunc(): Unit = {
   println("Append via fold: " + List.appendViaFold(a, d))
   val e = List(List(1, 2), List(9, 10), List(5, 7))
   println("Concatenate via fold: " + List.concatList(e))
+
+  println("---------------------------------------------")
+  println("Add one to each element: " + List.incrementEach(a))
+  println("Double to String: " + List.doubleToString(b))
+  println("Map: " + List.map(a)(x => x*2))
+  println("Map with folding: "+  List.mapFold(a)(x => "[" + x.toString + "]"))
+
 }
