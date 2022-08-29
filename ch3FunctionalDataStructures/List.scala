@@ -231,8 +231,30 @@ object List { // (4)
   * Exercise 13 (hard): Can you write foldLeft in terms of foldRight? Vice versa?
   * */
 
-  def foldLeftViaRight[A, B](l: List[A], z: B)(f: (B, A) => B): B =
+  def foldLeftViaFoldRight[A, B](l: List[A], z: B)(f: (B, A) => B): B = {
     foldRight(l, (b: B) => b)((a: A, g: B => B) => (b: B) => g(f(b, a)))(z)
+  }
+
+  def foldRightViaFoldLeft[A, B](l: List[A], z: B)(f: (A, B) => B): B = {
+    foldLeft(l, (b: B) => b)((g: B => B, a: A) => (b: B) => g(f(a, b)))(z)
+  }
+
+  /*
+  * Exercise 14: Implement append in terms of either foldLeft or foldRight.
+  * */
+  def appendViaFold[A](a1: List[A], a2: List[A]): List[A] = {
+    foldRight(a1, a2)((x, y) => Cons(x, y))
+  }
+
+  /*
+  * Exercise 15: Write a function that concatenates a list of lists into a single list.
+  * Its runtime should be linear in the total length of all lists. Try to use functions
+  * we have already defined.
+  * */
+  def concatList[A](ls: List[List[A]]): List[A] = {
+    foldRight(ls, Nil: List[A])(append)
+  }
+
 }
 
 @main
@@ -253,7 +275,7 @@ def mainFunc(): Unit = {
   * -- No because no case handles exiting with a 0.0. Therefore it would arrive at 0.0 via
   *    recursion cycles till it terminates with the exit condition (Nil).
   * */
-  println("\n\n")
+  println("---------------------------------------------")
   println("Sum Default: " + List.sum(a))
   println("Product Default: " + List.product(b))
   val c = new Cons[Double](1.0, Cons(0.0, Cons(3.0, Cons(4.0, Nil))))
@@ -263,7 +285,8 @@ def mainFunc(): Unit = {
   println("Sum foldLeft: " + List.sumLeft(a))
   println("Product foldLeft: " + List.productLeft(c))
   println("Length of 'a' foldLeft: " + List.lengthLeft(a))
-  println("\n\n")
+  println("---------------------------------------------")
+
   /*
   * Exercise 8: See what happens when you pass Nil and Cons to foldRight
   * e.g foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))
@@ -274,7 +297,10 @@ def mainFunc(): Unit = {
   * */
   println(List.foldRight(List(1,2,3), Nil:List[Int])(Cons(_,_))) // Cons(1,Cons(2,Cons(3,Nil)))
   // This shows that foldRight can be used to construct a singly linked list.
-  println("Reverse without fold:" + List.reverse(a))
-  println("Reverse with left fold: " + List.revFold(a))
-
+  println("Reverse without fold: " + List.reverse(a))
+  //println("Reverse with left fold: " + List.revFold(a))
+  val d = new Cons[Int](5, Cons(6, Cons(7, Cons(8, Nil))))
+  println("Append via fold: " + List.appendViaFold(a, d))
+  val e = List(List(1, 2), List(9, 10), List(5, 7))
+  println("Concatenate via fold: " + List.concatList(e))
 }
