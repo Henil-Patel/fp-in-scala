@@ -278,7 +278,7 @@ object List { // (4)
     foldRight(ls, Nil: List[String])((x, xs) => Cons(x.toString, xs))
   }
   /*
-  * Exercise 18L Write a function map, that generalizes modifying each element
+  * Exercise 18: Write a function map, that generalizes modifying each element
   * in a list while maintaining the structure of the list.
   * */
   def map[A, B](l: List[A])(f: A => B): List[B] = {
@@ -290,8 +290,31 @@ object List { // (4)
 
   // Alternatively using fold
   def mapFold[A, B](l: List[A])(f: A => B): List[B] = {
-    foldRight(l, Nil: List[A])((x, xs) => Cons(f(x), xs))
+    foldRight(l, Nil: List[B])((x, xs) => Cons(f(x), xs))
   }
+
+  /*
+  * Exercise 19: Write a function filter that removes elements from a list unless they satisfy
+  * a given predicate. Use it to remove all odd numbers from a List[Int].
+  * */
+  def filter[A](ls: List[A])(p: A => Boolean): List[A] = ls match {
+    case Nil => Nil
+    case Cons(x, xs) =>
+      if (p(x)) Cons(x, filter(xs)(p))
+      else xs
+  }
+
+  // Alternatively using fold
+  def filterFold[A](ls: List[A])(p: A => Boolean): List[A] =
+    foldRight(ls, Nil: List[A])((x, xs) => if (p(x)) Cons(x, xs) else xs)
+
+  /*
+  * Exercise 20: Write a function flatMap, that works like map except that the function
+  * given will return a list instead of a single result, and that list should be inserted
+  * into the final resulting list.*/
+
+  def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] =
+    concatList(map(l)(f))
 
 }
 
@@ -341,11 +364,11 @@ def mainFunc(): Unit = {
   println("Append via fold: " + List.appendViaFold(a, d))
   val e = List(List(1, 2), List(9, 10), List(5, 7))
   println("Concatenate via fold: " + List.concatList(e))
-
   println("---------------------------------------------")
   println("Add one to each element: " + List.incrementEach(a))
   println("Double to String: " + List.doubleToString(b))
   println("Map: " + List.map(a)(x => x*2))
-  println("Map with folding: "+  List.mapFold(a)(x => "[" + x.toString + "]"))
+  println("Map with folding: " +  List.mapFold(a)(x => "[" + x.toString + "]"))
+  println("Filter: " + )
 
 }
