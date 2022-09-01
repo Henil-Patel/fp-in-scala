@@ -113,6 +113,11 @@ object List { // (4)
     case Cons(_, xs) => xs
   }
 
+  def head[A](as: List[A]): A = as match {
+    case Nil => sys.error("head of empty list")
+    case Cons(x, _) => x
+  }
+
   /*
   * Exercise 3: Using the same idea, implement the function setHead for replacing the first
   * element of a List with a different value.
@@ -128,7 +133,7 @@ object List { // (4)
   * being dropped - we do not need to make a copy of the entire List.
   * */
   def drop[A](l: List[A], n: Int): List[A] = {
-    if (n <= 1) l
+    if (n < 1) l
     else l match {
       case Nil => Nil
       case Cons(_, xs) => drop(xs, n - 1)
@@ -343,6 +348,55 @@ object List { // (4)
     case (Cons(h1, t1), Cons(h2, t2)) => Cons(op(h1, h2), rowOperation(t1, t2)(op))
   }
 
+  /*
+  * Exercise 24: Implement hasSubsequence for checking whether a List contains another
+  * List asa subsequence. For instance, List(1,2,3,4) would have List(1,2), List(2,3), and
+  * List(4) as subsequences among others.
+  * */
+  def hasSubsequence[A](parent: List[A], child: List[A]): Boolean = {
+    val bound = size(child) - 1
+    def iter(a: Int, c: List[A]): Boolean = {
+
+      val res = contains(parent, head(c))
+      if (!res) false
+      else if (a >= bound) true
+      else iter(a + 1, tail(c))
+    }
+    iter(0, child)
+  }
+
+  /*
+  * Helper
+  * */
+  def contains[A](ls: List[A], elem: A): Boolean = {
+    val bound = size(ls) - 1
+    def iter(a: Int, ls: List[A]): Boolean = {
+      if (head(ls) == elem) true
+      else if (a >= bound) false
+      else iter(a+1, tail(ls))
+    }
+    iter(0, ls)
+  }
+
+  def size[A](ls: List[A]): Int = {
+    def iter[A](a: Int, ls: List[A]): Int = ls match {
+      case Nil => a
+      case Cons(_, xs) => iter(a + 1, xs)
+    }
+    iter(0, ls)
+  }
+
+  def exists[A](ls: List[A], p: A => Boolean): Boolean = {
+    val bound = size(ls)
+    def iter(a: Int): Boolean = {
+      if (contains(ls, a) && p(a)) true
+      else if (a >= bound) false
+      else iter(a + 1)
+    }
+    iter(0)
+  }
+
+
 }
 
 @main
@@ -353,8 +407,9 @@ def mainFunc(): Unit = {
   println("---------------------------------------------")
 
   println(List.setHead(a, 5))
-  println(List.tail(a))
-  println(List.drop(a, 4))
+  println("Head: " + List.head(a))
+  println("Tail: " + List.tail(a))
+  println(List.drop(a, 2))
   println(List.dropWhile(a)(b => b % 2 == 0))
   println(List.init(a))
   /*
@@ -397,9 +452,15 @@ def mainFunc(): Unit = {
   println("Map: " + List.map(a)(x => x*2))
   println("Map with folding: " +  List.mapFold(a)(x => "[" + x.toString + "]"))
   println("Filter: " + List.filterFold(a)(x => x % 2 == 0))
-  println("FlatMap: " + List.flatMap(a)(x => List(x, x + 2)))
+  println("FlatMap: " + List.flatMap(a)(x => List(x, x + 1, x+2)))
   println("---------------------------------------------")
   println("Row Operation (Sum): " + List.rowOperation(a, d)((x, y) => x + y))
   println("Row Operation (Multiply Scalar): " + List.rowOperation(a, List(2, 2, 2, 2))((x, y)=> x*y))
-
+  println("Size of list: " + List.size(List.flatMap(a)(x => List(x, x + 1, x+2))))
+  println("(1, 2, 3, 4) contains 4: " + List.contains(a, 4))
+  println("(1, 2, 3, 4) has subsequence (1, 3): " + List.hasSubsequence(List(1, 2, 3, 4), List(1, 3)))
+  println("(1, 2, 3, 4) has subsequence (18, 5, 1): " + List.hasSubsequence(List(1, 2, 3, 4), List(18, 5, 1)))
+  println("---------------------------------------------")
+  println("Exists: " + List.exists(a, (x: Int) => x == 2))
+  println("\n")
 }
