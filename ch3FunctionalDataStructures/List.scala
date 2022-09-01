@@ -313,8 +313,35 @@ object List { // (4)
   * given will return a list instead of a single result, and that list should be inserted
   * into the final resulting list.*/
 
-  def flatMap[A, B](l: List[A])(f: A => List[B]): List[B] =
-    concatList(map(l)(f))
+  def flatMap[A, B](ls: List[A])(f: A => List[B]): List[B] =
+    concatList(map(ls)(f))
+
+  /*
+  * Exercise 21: Can you use flatMap to implement filter?
+  * */
+  def filterViaFlatMap[A](ls: List[A])(p: A => Boolean): List[A] =
+    flatMap(ls)(x => if (p(x)) List(x) else Nil)
+
+  /*
+  * Exercise 22: Write a function that accepts two lists and constructs a new list
+  * by adding corresponding elements. For example List(1,2,3) and List(4,5,6) becomes
+  * List(5,7,9).
+  * */
+  def rowSum(as: List[Int], bs: List[Int]): List[Int] = (as, bs) match {
+    case (Nil, _) => Nil
+    case (_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(h1+h2, rowSum(t1, t2))
+  }
+
+  /*
+  * Exercise 23: Generalize the function you just wrote so that it's not specific to
+  * integers or addition.
+  * */
+  def rowOperation[A](as: List[A], bs: List[A])(op: (A, A) => A): List[A] = (as, bs) match {
+    case (Nil, _) => Nil
+    case(_, Nil) => Nil
+    case (Cons(h1, t1), Cons(h2, t2)) => Cons(op(h1, h2), rowOperation(t1, t2)(op))
+  }
 
 }
 
@@ -369,6 +396,10 @@ def mainFunc(): Unit = {
   println("Double to String: " + List.doubleToString(b))
   println("Map: " + List.map(a)(x => x*2))
   println("Map with folding: " +  List.mapFold(a)(x => "[" + x.toString + "]"))
-  println("Filter: " + )
+  println("Filter: " + List.filterFold(a)(x => x % 2 == 0))
+  println("FlatMap: " + List.flatMap(a)(x => List(x, x + 2)))
+  println("---------------------------------------------")
+  println("Row Operation (Sum): " + List.rowOperation(a, d)((x, y) => x + y))
+  println("Row Operation (Multiply Scalar): " + List.rowOperation(a, List(2, 2, 2, 2))((x, y)=> x*y))
 
 }
