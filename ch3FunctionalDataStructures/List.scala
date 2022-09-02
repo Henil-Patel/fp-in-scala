@@ -386,7 +386,7 @@ object List { // (4)
     iter(0, ls)
   }
 
-  def exists[A](ls: List[A], p: A => Boolean): Boolean = {
+  def exists(ls: List[Int], p: Int => Boolean): Boolean = {
     val bound = size(ls)
     def iter(a: Int): Boolean = {
       if (contains(ls, a) && p(a)) true
@@ -394,6 +394,20 @@ object List { // (4)
       else iter(a + 1)
     }
     iter(0)
+  }
+
+  def forall(ls: List[Int], p: Int => Boolean): Boolean = {
+    val bound = size(ls)
+    def iter(a: Int): Boolean = {
+      if (contains(ls, a) && !p(a)) false
+      else if (a >= bound) true
+      else iter(a + 1)
+    }
+    iter(0)
+  }
+
+  def exists2(ls: List[Int], p: Int => Boolean): Boolean = {
+    !forall(ls, (x: Int) => !p(x))
   }
 
 
@@ -461,6 +475,6 @@ def mainFunc(): Unit = {
   println("(1, 2, 3, 4) has subsequence (1, 3): " + List.hasSubsequence(List(1, 2, 3, 4), List(1, 3)))
   println("(1, 2, 3, 4) has subsequence (18, 5, 1): " + List.hasSubsequence(List(1, 2, 3, 4), List(18, 5, 1)))
   println("---------------------------------------------")
-  println("Exists: " + List.exists(a, (x: Int) => x == 2))
+  println("Exists: " + List.exists(a, (x: Int) => x == 7))
   println("\n")
 }
