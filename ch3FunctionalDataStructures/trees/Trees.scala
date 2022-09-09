@@ -61,6 +61,16 @@ object Tree {
   * function. Can you draw an analogy between this fold function and the left and right folds
   * for List?
   * */
+  def fold[A, B](t: Tree[A], z: A => B)(f: (B, B) => B): B = {
+    t match {
+      case Leaf(x) => z(x)
+      case Branch(l, r) => f(fold(l, z)(f), fold(r, z)(f))
+    }
+  }
+
+  def mapFold[A, B](t: Tree[A])(z: A => B): Tree[B] = {
+    fold(t, x => Leaf(z(x)))((x, y) => Branch(x, y))
+  }
 }
 
 @main
@@ -70,4 +80,5 @@ def mainFunc(): Unit = {
   println("Maximum: " + Tree.maximum(a))
   println("Depth: " + Tree.depth(a))
   println("Map: " + Tree.map(a)(x => x * -1))
+  println("Map via Fold:" + Tree.mapFold(a)(x => x + 5))
 }
