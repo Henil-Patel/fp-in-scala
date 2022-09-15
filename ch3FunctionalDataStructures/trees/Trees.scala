@@ -61,15 +61,28 @@ object Tree {
   * function. Can you draw an analogy between this fold function and the left and right folds
   * for List?
   * */
-  def fold[A, B](t: Tree[A], z: A => B)(f: (B, B) => B): B = {
+
+  def fold[A, B](t: Tree[A], z: A => B, f: (B, B) => B): B = {
     t match {
       case Leaf(x) => z(x)
-      case Branch(l, r) => f(fold(l, z)(f), fold(r, z)(f))
+      case Branch(l, r) => f(fold(l, z, f), fold(r, z, f))
     }
   }
 
-  def mapFold[A, B](t: Tree[A])(z: A => B): Tree[B] = {
-    fold(t, x => Leaf(z(x)))((x, y) => Branch(x, y))
+  def sizeFold[A](t: Tree[A]): Int = {
+    fold(t, (x: A) => 1, (l: Int, r: Int) => 1 + l + r)
+  }
+
+  def maximumFold(t: Tree[Int]): Int = {
+    fold(t, (x: Int) => x, (l: Int, r: Int) => if (l > r) l else r)
+  }
+
+  def depthFold[A](t: Tree[A]): Int = {
+    fold(t, (x: A) => 0, (l: Int, r: Int) => 1 + l.max(r))
+  }
+
+  def mapFold[A, B](t: Tree[A], f: A => B): Tree[B] = {
+    fold(t, (x: A) => Leaf(f(x)), (a: Tree[B], b: Tree[B]) => Branch(a, b))
   }
 }
 
@@ -80,5 +93,9 @@ def mainFunc(): Unit = {
   println("Maximum: " + Tree.maximum(a))
   println("Depth: " + Tree.depth(a))
   println("Map: " + Tree.map(a)(x => x * -1))
-  println("Map via Fold:" + Tree.mapFold(a)(x => x + 5))
+  println("------------------------------------")
+  println("Size via Fold: " + Tree.sizeFold(a))
+  println("Maximum via Fold: " + Tree.maximumFold(a))
+  println("Depth via Fold: " + Tree.depthFold(a))
+  println("Map via Fold: " + Tree.mapFold(a, x => x + 5))
 }
