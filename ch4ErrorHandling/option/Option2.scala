@@ -12,6 +12,23 @@ enum Option[+A]:
     }
   }
 
+  def getOrElse[B >: A](default: => B): B = {
+    this match {
+      case None => default
+      case Some(x) => x
+    }
+  }
+
+  def flatMap[B](f: A => Option[B]): Option[B] = {
+    map(f).getOrElse(None)
+  }
+
+  def orElse[B >: A](ob: => Option[B]): Option[B] = {
+    map(Some(_)).getOrElse(ob)
+  }
+
+
+
 object Option:
   def mean(xs: Seq[Double]): Option[Double] = {
     if (xs.isEmpty) None
@@ -26,4 +43,6 @@ def mainF(): Unit = {
   val retMt = Option.mean(mt)
   println("Mean of sq: " + retSq)
   println("Mean of mt: " + retMt)
+
+
 }
