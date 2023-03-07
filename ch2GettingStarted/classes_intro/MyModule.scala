@@ -21,11 +21,15 @@ object MyModule {
     go(n, 1)
   }
 
-  // Fibonacci numbers
+  // Fibonacci numbers - tail recursive
   def fib(n: Int): Int = {
-    if (n == 0) then 0
-    else if (n == 1) then 1
-    else fib(n-2) + fib(n-1)
+    def go(n: Int, a: Int, b: Int) : Int =  {
+      if (n == 0) a
+      else if (n == 1) b
+      else go(n - 1, b, a + b)
+    }
+    go(n, 0, 1)
+
   }
 
   def main(args: Array[String]): Unit = {
